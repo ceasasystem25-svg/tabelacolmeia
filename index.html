@@ -136,9 +136,19 @@
 
         tbody tr:hover { background-color: #fcfcfc; }
         
+        /* CORREÇÃO 1: Evita que a linha seja cortada ao meio na quebra de página do PDF */
+        tbody tr {
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+
         .linha-oferta { background-color: #fff8e1 !important; }
         .linha-oferta td { font-weight: bold; color: #d84315; }
+        
+        /* CORREÇÃO 2: Força o selo a não amassar o texto */
         .badge-oferta {
+            display: inline-block;
+            white-space: nowrap;
             background-color: #ff3d00;
             color: white;
             font-size: 10px;
@@ -194,7 +204,6 @@
     </div>
 
     <script>
-        // === 3. COLE A URL DO SEU APPS SCRIPT AQUI ===
         const API_URL = 'https://script.google.com/macros/s/AKfycbwmzjYDJHOqdfzo1sxpsd3rppfptEHcsH997Tc2Ck-P6CQ2-KxOW3VFDDzfFOsI5KsL/exec';
 
         const dataHoje = new Date().toLocaleDateString('pt-BR');
@@ -265,12 +274,14 @@
             areaRolagem.style.maxHeight = 'none';
             areaRolagem.style.overflowY = 'visible';
 
+            // CORREÇÃO 3: Margens laterais adicionadas e o comando de pagebreak ativado!
             const opcoes = {
-                margin:       [10, 0, 10, 0],
+                margin:       [10, 5, 10, 5], 
                 filename:     `Tabela_Colmeia_${dataHoje.replace(/\//g, '-')}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2, useCORS: true }, 
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: ['css', 'legacy'] }
             };
 
             html2pdf().set(opcoes).from(elemento).save().then(() => {
